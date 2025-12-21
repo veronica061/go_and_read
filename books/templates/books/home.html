@@ -1,0 +1,42 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Книжный уголок - Главная страница{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Откройте мир книг с нами</h1>
+        <p>Тысячи книг на любой вкус. От классики до современных бестселлеров. Читайте где угодно и когда угодно.</p>
+        <a href="{% url 'catalog' %}" class="btn">Перейти в каталог</a>
+    </div>
+</section>
+
+<div class="container">
+    <section class="featured-books">
+        <h2 class="section-title">Популярные книги</h2>
+        <div class="books-grid">
+            {% for book in featured_books %}
+            <div class="book-card">
+                <div class="book-cover">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        Обложка книги
+                    {% endif %}
+                </div>
+                <div class="book-info">
+                    <div class="book-title">{{ book.title }}</div>
+                    <div class="book-author">{{ book.author.name }}</div>
+                    <div class="book-price">{{ book.price }} ₽</div>
+                    {% if user.is_authenticated %}
+                        <button class="btn add-to-cart-btn" data-book-id="{{ book.id }}" style="width: 100%; margin-top: 10px;">В корзину</button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn" style="width: 100%; margin-top: 10px; display: block; text-align: center;">В корзину</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
