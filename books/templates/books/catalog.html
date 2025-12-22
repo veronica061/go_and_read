@@ -1,0 +1,69 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Книжный уголок - Каталог{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="catalog-header">
+        <h2 class="section-title">Каталог книг</h2>
+        <div>
+            <form method="get" class="search-form">
+                <input type="text" name="search" class="form-control" placeholder="Поиск книг..." value="{{ request.GET.search }}">
+            </form>
+        </div>
+    </div>
+
+    <div class="filters">
+        <form method="get" class="filter-form">
+            <select name="genre" class="filter-select" onchange="this.form.submit()">
+                <option value="">Все жанры</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if request.GET.genre == genre.id|stringformat:"i" %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="sort" class="filter-select" onchange="this.form.submit()">
+                <option value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>По названию</option>
+                <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>По цене (возрастание)</option>
+                <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>По цене (убывание)</option>
+                <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>По популярности</option>
+            </select>
+
+            {% if request.GET.search %}
+                <input type="hidden" name="search" value="{{ request.GET.search }}">
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="books-grid">
+        {% for book in books %}
+        <div class="book-card">
+            <div class="book-cover">
+                {% if book.cover_image %}
+                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    Обложка книги
+                {% endif %}
+            </div>
+            <div class="book-info">
+                <div class="book-title">{{ book.title }}</div>
+                <div class="book-author">{{ book.author.name }}</div>
+                <div class="book-price">{{ book.price }} ₽</div>
+                {% if user.is_authenticated %}
+                    <button class="btn add-to-cart-btn" data-book-id="{{ book.id }}" style="width: 100%; margin-top: 10px;">В корзину</button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn" style="width: 100%; margin-top: 10px; display: block; text-align: center;">В корзину</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <h3>Книги не найдены</h3>
+            <p>Попробуйте изменить параметры поиска</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

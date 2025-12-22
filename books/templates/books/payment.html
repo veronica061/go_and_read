@@ -1,0 +1,99 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Книжный уголок - Оформление заказа{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-title">Оформление заказа</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="full-name">ФИО</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                    <div class="errorlist">{{ form.full_name.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="address">Адрес доставки</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <div class="errorlist">{{ form.address.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="errorlist">{{ form.phone.errors }}</div>
+                {% endif %}
+            </div>
+
+            <h3 style="margin: 20px 0 10px;">Способ оплаты</h3>
+
+            <div class="payment-methods">
+                <div class="payment-method active" data-payment="card">
+                    <h4>Банковская карта</h4>
+                </div>
+                <div class="payment-method" data-payment="cash">
+                    <h4>Наличные при получении</h4>
+                </div>
+            </div>
+
+            <input type="hidden" name="payment_method" id="payment-method" value="card">
+
+            <div id="card-form" class="payment-form active">
+                <div class="form-group">
+                    <label for="card-number">Номер карты</label>
+                    <input type="text" id="card-number" class="form-control" placeholder="0000 0000 0000 0000">
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="card-expiry">Срок действия</label>
+                        <input type="text" id="card-expiry" class="form-control" placeholder="ММ/ГГ">
+                    </div>
+
+                    <div class="form-group" style="flex: 1;">
+                        <label for="card-cvc">CVC</label>
+                        <input type="text" id="card-cvc" class="form-control" placeholder="000">
+                    </div>
+                </div>
+            </div>
+
+            <div id="cash-form" class="payment-form">
+                <p>Оплата наличными при получении заказа. Курьер предоставит чек.</p>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Оформить заказ</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const paymentMethodInput = document.getElementById('payment-method');
+
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                paymentMethods.forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+
+                const paymentType = this.getAttribute('data-payment');
+                paymentMethodInput.value = paymentType;
+
+                document.querySelectorAll('.payment-form').forEach(form => {
+                    form.classList.remove('active');
+                });
+                document.getElementById(`${paymentType}-form`).classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}
